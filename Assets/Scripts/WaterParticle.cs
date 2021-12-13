@@ -6,45 +6,34 @@ public class WaterParticle : MonoBehaviour {
 
     // --- Properties ---
     [HideInInspector]
+    public Vector3 prevPosition;
+    [HideInInspector]
     public Vector3 velocity;
     [HideInInspector]
-    public float dens;
+    public float density;
     [HideInInspector]
-    public float densN;
+    public float nearDensity;
     [HideInInspector]
-    public float press;
+    public float pressure;
     [HideInInspector]
-    public float pressN;
+    public float nearPressure;
 
     private float radius;
-    private float K_restitution = 0.8f;
-
+    private float k_restitution = .7f;
+    private Vector3 gravity = new Vector3(0f, -9.8f, 0f);
 
     // --- Methods ---
-
-
-
-    // Start is called before the first frame update
     void Start() {
         radius = this.GetComponent<SphereCollider>().radius;
     }
 
-    // Update is called once per frame
-    void Update() {
-
-    }
-
-
-    private void OnCollisionEnter(Collision collision) {
+     public void OnCollisionEnter(Collision collision) {
         float d = radius - (collision.GetContact(0).point - transform.position).magnitude;
         Vector3 normal = collision.GetContact(0).normal.normalized;
-        transform.position += normal * d;
-        velocity -= 2 * K_restitution * Vector3.Dot(velocity, normal) * normal;
-    }
+        velocity *= -k_restitution;
+     }
 
-    private void OnCollisionStay(Collision collision) {
-        float d = radius - (collision.GetContact(0).point - transform.position).magnitude;
-        Vector3 normal = collision.GetContact(0).normal.normalized;
-        transform.position += normal * d;
+    public void OnCollisionStay(Collision collision) {
+        velocity -= gravity * Time.deltaTime;
     }
 }

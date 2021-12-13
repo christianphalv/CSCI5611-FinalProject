@@ -6,9 +6,9 @@ public class Spawner : MonoBehaviour {
 
     public WaterSimulation simulation;
     private float timer;
-    private int max = 300;
+    private int max = 200;
     private int count = 0;
-    private float v = 0.1f;
+    private float v = 0.8f;
 
 
     // Start is called before the first frame update
