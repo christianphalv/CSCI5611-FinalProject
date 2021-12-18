@@ -17,6 +17,7 @@ public class WaterSimulation : MonoBehaviour {
     public float nearK_stiff = 10f;
     public float K_restDensity = 10f;
     //public float K_restitution = 0.8f;
+    public float K_spring = 0.5f;
 
 
 
@@ -53,7 +54,15 @@ public class WaterSimulation : MonoBehaviour {
 
         //adjust Springs
 
-        //applySpring Displacments
+        //applySpring Displacments, ELASTICITY
+        foreach(ParticlePair pair in pairs){
+            float r = (particles[pair.p1].transform.position - particles[pair.p2].transform.position).magnitude;
+            Vector3 normal = (particles[pair.p1].transform.position - particles[pair.p2].transform.position).normalized;
+            Vector3 displacement = Mathf.Pow(Time.deltaTime, 2) * K_spring * (1 - pair.L/h) * (pair.L - r) * normal;
+            particles[pair.p1].transform.position -= displacement/2;
+            particles[pair.p2].transform.position += displacement/2;
+
+        }
 
         //DOUBLE DENSITY RELAXATION - start
         // Update densities
@@ -79,6 +88,7 @@ public class WaterSimulation : MonoBehaviour {
             float nearPressure = particles[pair.p1].nearPressure + particles[pair.p2].nearPressure;
             float displacement = (pressure * pair.q2 + nearPressure * pair.q3) * Mathf.Pow(Time.deltaTime, 2);
             Vector3 normal = (particles[pair.p1].transform.position - particles[pair.p2].transform.position).normalized;
+            //update differently here!
             particles[pair.p1].velocity += displacement * normal;
             particles[pair.p2].velocity -= displacement * normal;
         }
@@ -110,6 +120,7 @@ public class ParticlePair {
     public float q;
     public float q2;
     public float q3;
+    public float L = 0.005f; //spring rest length, less than h
 
     public ParticlePair(int p1, int p2) {
         this.p1 = p1;
