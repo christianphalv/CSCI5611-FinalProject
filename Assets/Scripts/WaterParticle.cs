@@ -22,7 +22,12 @@ public class WaterParticle : MonoBehaviour {
     private float mass;
     private float elasticity = 0.5f;
     private float k_restitution = .7f;
+
     private Vector3 gravity = new Vector3(0f, -9.8f, 0f);
+
+    //linked list stuff
+    public WaterParticle nextParticle;
+    public WaterParticle prevParticle;
 
     // --- Methods ---
     void Start() {

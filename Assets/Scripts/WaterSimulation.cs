@@ -7,7 +7,8 @@ public class WaterSimulation : MonoBehaviour {
 
     // --- Properties ---
     public WaterParticle particlePrefab;
-    private List<WaterParticle> particles;
+    [SerializeField] private Spawner spawner;
+    private WaterParticle[] particles;//make an array of particles, each a linked list of neighbors
     private Vector3 gravity = new Vector3(0f, -9.8f, 0f);
     private float radius;
 
@@ -16,114 +17,183 @@ public class WaterSimulation : MonoBehaviour {
     public float K_stiff = 10f;
     public float nearK_stiff = 10f;
     public float K_restDensity = 10f;
-    //public float K_restitution = 0.8f;
     public float K_spring = 0.5f;
+    public float L = 0.005f; //spring rest length, less than h
 
 
 
     // --- Methods ---
-    public void createParticle(Vector3 position) {
+    public void Initialize() {
+        particles = new WaterParticle[100];//spawner.max];
+        radius = particlePrefab.gameObject.transform.localScale.x / 2;
+
+    }
+    public void createParticle(Vector3 position, int index) {
         WaterParticle newParticle = Instantiate(particlePrefab, position, Quaternion.identity);
-        particles.Add(newParticle);
+        particles[index] = newParticle;
     }
 
     private void updateParticles() {
-        // Create pairs
-        List<ParticlePair> pairs = new List<ParticlePair>(); ;
-        for (int i = 0; i < particles.Count; i++) {
-            for (int j = i; j < particles.Count; j++) {
-                if ((particles[i].transform.position - particles[j].transform.position).magnitude < h) {
-                    pairs.Add(new ParticlePair(i, j));
+        // Add gravity force, save previous positions, AND advance to predicted positions
+        foreach(WaterParticle p in particles){
+            if(p != null){
+                p.velocity += gravity * Time.deltaTime;
+                p.prevPosition = p.transform.position;
+                p.transform.position += p.velocity * 0.9f * Time.deltaTime;//damping included
+                WaterParticle ptr = p.nextParticle;
+                while(ptr != null){
+                    if(Vector3.Magnitude(p.transform.position - ptr.transform.position) > h){
+                        //remove particle from list of neighbors
+                        if(ptr.nextParticle != null){
+                            ptr.nextParticle.prevParticle = ptr.prevParticle;
+                        }
+                        else{//if at end of list then remove self
+                            ptr.prevParticle.nextParticle = null;
+                        }
+                    }
+                    ptr = ptr.nextParticle;
                 }
             }
-        }
 
-        // Add gravity force, save previous positions, AND advance to predicted positions
-        foreach (WaterParticle p in particles) {
-            p.velocity += gravity * Time.deltaTime;
-            p.prevPosition = p.transform.position;
-            p.transform.position += p.velocity * 0.9f * Time.deltaTime;//damping included
         }
+ 
 
-        //Apply viscosity
+        //everything below (until velocity update) ONLY will occur between a particle and its neighbors
+        //Apply viscosity -- would be in between apply grav and move particles
         // foreach(ParticlePair pair in pairs){
 
 
         // }
 
-
+        //ONLY DO THESE PARTS for particles affected by main particle
         //adjust Springs
 
         //applySpring Displacments, ELASTICITY
-        foreach(ParticlePair pair in pairs){
-            float r = (particles[pair.p1].transform.position - particles[pair.p2].transform.position).magnitude;
-            Vector3 normal = (particles[pair.p1].transform.position - particles[pair.p2].transform.position).normalized;
-            Vector3 displacement = Mathf.Pow(Time.deltaTime, 2) * K_spring * (1 - pair.L/h) * (pair.L - r) * normal;
-            particles[pair.p1].transform.position -= displacement/2;
-            particles[pair.p2].transform.position += displacement/2;
+        foreach(WaterParticle p in particles){
+            if(p!= null){
+                WaterParticle ptr = p.nextParticle;
+                while(ptr!= null){
+                    float r = (p.transform.position - ptr.transform.position).magnitude;
+                    Vector3 normal = (p.transform.position - ptr.transform.position).normalized;
+                    Vector3 displacement = Mathf.Pow(Time.deltaTime, 2) * K_spring * (1 - L/h) * (L - r) * normal;
+            //CHECK HERE about displacements?
+                    p.transform.position -= displacement/2;
+                    ptr.transform.position += displacement/2;
 
-        }
+
+                    float q = 1 - ((p.transform.position - ptr.transform.position).magnitude / h);
+                    float q2 = Mathf.Pow(q, 2);
+                    float q3 = Mathf.Pow(q, 3);
+                    p.density += q2;
+                    ptr.density += q2;
+                    p.nearDensity += q3;
+                    ptr.nearDensity += q3;
+
+
+                    float pressure = p.pressure + ptr.pressure;
+                    float nearPressure = p.nearPressure + ptr.nearPressure;
+                    float disp = (pressure * q2 + nearPressure * q3) * Mathf.Pow(Time.deltaTime, 2);
+                    normal = (p.transform.position - ptr.transform.position).normalized;
+                
+                    //update differently here!
+                    p.velocity += disp * normal;
+                    p.velocity -= disp * normal;
+                    
+                    ptr = ptr.nextParticle;
+                }
+
+                p.pressure = K_stiff * (p.density - K_restDensity);
+                p.nearPressure = nearK_stiff * p.nearDensity;
+
+            }
+            
+       }
 
         //DOUBLE DENSITY RELAXATION - start
         // Update densities
-        foreach (ParticlePair pair in pairs) {
-            pair.q = 1 - ((particles[pair.p1].transform.position - particles[pair.p2].transform.position).magnitude / h);
-            pair.q2 = Mathf.Pow(pair.q, 2);
-            pair.q3 = Mathf.Pow(pair.q, 3);
-            particles[pair.p1].density += pair.q2;
-            particles[pair.p2].density += pair.q2;
-            particles[pair.p1].nearDensity += pair.q3;
-            particles[pair.p2].nearDensity += pair.q3;
-        }
+        // foreach(WaterParticle p in particles){
+        //     if(p != null){
+        //         WaterParticle ptr = p.nextParticle;
+        //         while(ptr!= null){
+                    
+
+        //             ptr = ptr.nextParticle;
+        //         }
+        //     }
+            
+        // }
 
         // Update pressures
-        foreach (WaterParticle p in particles) {
-            p.pressure = K_stiff * (p.density - K_restDensity);
-            p.nearPressure = nearK_stiff * p.nearDensity;
-        }
+        // foreach (WaterParticle p in particles) {
+        //     if(p!= null){
+        //         p.pressure = K_stiff * (p.density - K_restDensity);
+        //         p.nearPressure = nearK_stiff * p.nearDensity;
+        //     }
+        // }
 
         // Add pressure force
-        foreach (ParticlePair pair in pairs) {
-            float pressure = particles[pair.p1].pressure + particles[pair.p2].pressure;
-            float nearPressure = particles[pair.p1].nearPressure + particles[pair.p2].nearPressure;
-            float displacement = (pressure * pair.q2 + nearPressure * pair.q3) * Mathf.Pow(Time.deltaTime, 2);
-            Vector3 normal = (particles[pair.p1].transform.position - particles[pair.p2].transform.position).normalized;
-            //update differently here!
-            particles[pair.p1].velocity += displacement * normal;
-            particles[pair.p2].velocity -= displacement * normal;
-        }
+        // foreach(WaterParticle p in particles){
+        //     if(p!= null){
+        //         WaterParticle ptr = p.nextParticle;
+        //         while(ptr!= null){
+        //             float q = 1 - ((p.transform.position - ptr.transform.position).magnitude / h);
+        //             float q2 = Mathf.Pow(q, 2);
+        //             float q3 = Mathf.Pow(q, 3);
+        //             float pressure = p.pressure + ptr.pressure;
+        //             float nearPressure = p.nearPressure + ptr.nearPressure;
+        //             float displacement = (pressure * q2 + nearPressure * q3) * Mathf.Pow(Time.deltaTime, 2);
+        //             Vector3 normal = (p.transform.position - ptr.transform.position).normalized;
+                
+        //             //update differently here!
+        //             p.velocity += displacement * normal;
+        //             p.velocity -= displacement * normal;
+        //             //also like how is this affecting the sim? vel is reset in next few lines
+
+        //             ptr = ptr.nextParticle;
+        //         }
+        //     }
+            
+        // }
         ////DOUBLE DENSITY RELAXATION - end
 
-        // Update velocities
-        foreach (WaterParticle p in particles) {
-            p.velocity = (p.transform.position - p.prevPosition) / Time.deltaTime;
+        //update neighbors
+        
+
+
+        //Find/update velocity of neighbors of each particle
+        foreach (WaterParticle p in particles){//CHANGE TO +=, LOOKED PROMISING!
+            if(p!= null){
+                p.velocity = (p.transform.position - p.prevPosition) / Time.deltaTime;
+            }
         }
     }
 
 
-    // Start is called before the first frame update
-    void Start() {
-        particles = new List<WaterParticle>();
-        radius = particlePrefab.gameObject.transform.localScale.x / 2;
-
+    private void updateNeighbors(){
+        for(int i = 0; i < particles.Length/2; i++){
+            if(particles[i] != null){
+                for(int j = 0; j < particles.Length; j++){
+                    if(particles[j] != null){
+                        if(i!=j && Vector3.Magnitude(particles[i].transform.position - particles[j].transform.position) < h){
+                            if(particles[i].nextParticle!= null){
+                                particles[i].nextParticle.prevParticle = particles[j];
+                            }
+                            if(particles[j].nextParticle != null){
+                                particles[j].nextParticle.prevParticle = particles[i];
+                            }
+                            particles[i].nextParticle = particles[j];
+                            particles[j].nextParticle = particles[i];
+                        }
+                    }
+                }
+            } 
+        }
     }
 
     private void FixedUpdate() {
-        updateParticles();
-
-    }
-}
-
-public class ParticlePair {
-    public int p1;
-    public int p2;
-    public float q;
-    public float q2;
-    public float q3;
-    public float L = 0.005f; //spring rest length, less than h
-
-    public ParticlePair(int p1, int p2) {
-        this.p1 = p1;
-        this.p2 = p2;
+        if(spawner.finished){
+            updateParticles();
+            updateNeighbors();
+        }
     }
 }

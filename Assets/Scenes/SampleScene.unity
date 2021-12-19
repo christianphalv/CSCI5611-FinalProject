@@ -434,11 +434,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particlePrefab: {fileID: -8162048502727457301, guid: 4a2714bf1f33966499440918ad735a2f, type: 3}
+  spawner: {fileID: 1910358089}
   h: 0.01
   K_stiff: 10
   nearK_stiff: 10
   K_restDensity: 10
   K_spring: 10
+  L: 0.005
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,6 +619,17 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1176589489}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1910358089 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -8207214923437941233, guid: 702a8c4057c4e0f4090c5a635f8951fc, type: 3}
+  m_PrefabInstance: {fileID: 703535646}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79602eeb9a8f4bf4db55cb09b21babe0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1992224198
 GameObject:
   m_ObjectHideFlags: 0
