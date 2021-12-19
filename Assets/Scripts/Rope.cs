@@ -36,11 +36,11 @@ public class Rope : MonoBehaviour {
         for (int i = 0; i < _numNodes; i++) {
             _positions[i] = this.transform.position - new Vector3(0f, i * K_restLength, 0f);
             _positions[i] = rotatePointAboutPivot(_positions[i], this.transform.position, this.transform.rotation);
-            _velocities[i] = this.transform.position;
+            _velocities[i] = new Vector3(0f, 0f, 0f);
         }
 
         // Setup line renderer
-        _lineRenderer.positionCount = _numNodes - 1;
+        _lineRenderer.positionCount = _numNodes;
     }
 
 
@@ -55,6 +55,7 @@ public class Rope : MonoBehaviour {
 
         // Update rope simulation
         updateRope(Time.deltaTime);
+        updateEndObject();
     }
 
     private void OnDrawGizmos() {
@@ -94,17 +95,26 @@ public class Rope : MonoBehaviour {
 
         // Fix top node
         _velocities[0] = new Vector3(0f, 0f, 0f);
+        _positions[0] = this.transform.position;
 
         // Update positions
-        for (int i = 0; i < _numNodes; i++) {
+        for (int i = 1; i < _numNodes; i++) {
             _positions[i] += _velocities[i] * dt;
         }
     }
 
     private void renderRope() {
-
-        // Update positions
         _lineRenderer.SetPositions(_positions);
+    }
+
+    private void updateEndObject() {
+
+        Transform endObject = GetComponentInChildren<Transform>();
+        Debug.Log(endObject);
+
+        if (endObject) {
+            endObject.position = _positions[_numNodes - 1];
+        }
     }
 
     private Vector3 rotatePointAboutPivot(Vector3 point, Vector3 pivot, Quaternion rotation) {
