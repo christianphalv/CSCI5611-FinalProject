@@ -51,7 +51,8 @@ public class ProjectileSpawner : MonoBehaviour {
 
         // Generate random position
         Vector3 randomHeight = new Vector3(0f, Random.Range(0f, screenTopRight.y), 0f);
-        Vector3 spawnPosition = screenTopRight - randomHeight;
+        Vector3 screenOffset = new Vector3(1f, 0f, 0f);
+        Vector3 spawnPosition = screenTopRight + screenOffset - randomHeight;
 
         // Generate random speed
         float speed = Random.Range(_minProjectileSpeed, _maxProjectileSpeed);
