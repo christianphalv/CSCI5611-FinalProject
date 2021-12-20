@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if(started){
             if(Input.GetKey(KeyCode.RightArrow)){
                 gameObject.transform.Translate(Vector3.right * speed * Time.deltaTime);
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour
                 gameObject.transform.Translate(Vector3.left * speed * Time.deltaTime);
             }
         }
+        
     }
 
     public void StartGame(){

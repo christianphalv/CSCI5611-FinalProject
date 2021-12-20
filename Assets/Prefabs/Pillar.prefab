@@ -13,8 +13,7 @@ GameObject:
   - component: {fileID: 4172225215699728201}
   - component: {fileID: 4172225215699728198}
   - component: {fileID: 6005659702674322886}
-  - component: {fileID: 3602480289920871301}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pillar
   m_TagString: Pillar
   m_Icon: {fileID: 0}
@@ -92,7 +91,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4172225215699728199}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 3}
@@ -109,19 +108,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86a011ea072d5844db4daf3dadf3d522, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!54 &3602480289920871301
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4172225215699728199}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  canSpawn: 0
+  xStart: 0
