@@ -7,6 +7,7 @@ TagManager:
   - Ground
   - Pillar
   - Rope
+  - Projectile
   layers:
   - Default
   - TransparentFX

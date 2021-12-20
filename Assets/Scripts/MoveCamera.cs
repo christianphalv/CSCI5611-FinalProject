@@ -27,7 +27,7 @@ public class MoveCamera : MonoBehaviour
    }
 
    public void MoveCameraToTitle(){
-       StartCoroutine(MoveToTitle());
+       transform.position = new Vector3(transform.position.x, 90.5f, -13);
    }
 
    IEnumerator MoveToTitle(){

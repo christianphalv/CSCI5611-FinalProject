@@ -38,6 +38,14 @@ public class ProjectileSpawner : MonoBehaviour {
         }
     }
 
+    public void DestroyProjectiles(){//gets called on restart or quit
+        GameObject[] prefabs = GameObject.FindGameObjectsWithTag("Projectile");
+        foreach  (GameObject prefab in prefabs)
+            {
+                Destroy(prefab);
+            }
+    }
+
     private void spawnProjectile() {
 
 

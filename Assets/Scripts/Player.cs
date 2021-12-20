@@ -44,12 +44,12 @@ public class Player : MonoBehaviour {
 
     void Update() {
 
-
-        playerMove();
-        checkGrounded();
-        playerJump();
-        playerRope();
-
+        if(_playerController.started){
+            playerMove();
+            checkGrounded();
+            playerJump();
+            playerRope();
+        }
         if (this.transform.position.y < 0.5f) {
             _playerController.GameOver();
         }
@@ -115,7 +115,7 @@ public class Player : MonoBehaviour {
         Collider[] colliders = Physics.OverlapSphere(_groundedPoint.position, _groundedRadius, _groundLayer);
 
         // Set grounded if any ground colliders
-        if (colliders.Length > 0) {
+        if (colliders.Length >= 0) {
             _isGrounded = true;
         } else {
             _isGrounded = false;
