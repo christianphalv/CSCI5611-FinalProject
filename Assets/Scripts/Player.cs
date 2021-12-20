@@ -7,11 +7,15 @@ using UnityEngine.Scripting;
 public class Player : MonoBehaviour {
 
     // Public properties
+    public Transform _groundedPoint;
+    public Rope _ropePrefab;
+
+    [Header("Tuning Parameters")]
     public float _initialMovementSpeed;
     public float _jumpSpeed;
     public float _maxRopeDistance;
-    public Transform _groundedPoint;
-    public Rope _ropePrefab;
+    public float _ropeJumpMin;
+    public float _ropeJumpMax;
 
     // Physics properties
     private float _movementSpeed;
@@ -60,7 +64,7 @@ public class Player : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded) {
             _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, _jumpSpeed, 0f);
         } else if (Input.GetKeyDown(KeyCode.Space) && _currentRope) {
-            _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, Mathf.Clamp01(_currentRope.getEndNode().velocity.y) * _jumpSpeed, 0f);
+            _rigidbody.velocity = new Vector3(Mathf.Clamp(_currentRope.getEndNode().velocity.x, _ropeJumpMin, _ropeJumpMax) * _movementSpeed, Mathf.Clamp(_currentRope.getEndNode().velocity.y, _ropeJumpMin, _ropeJumpMax) * _jumpSpeed, 0f);
             detachFromRope();
         }
     }
@@ -85,7 +89,12 @@ public class Player : MonoBehaviour {
         Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, _maxRopeDistance, _ropeAttachLayer)) {
-            _currentRope = Instantiate<Rope>(_ropePrefab, new Vector3(hit.point.x, hit.point.y, 0f), Quaternion.identity);
+            Plane xyPlane = new Plane(Vector3.forward, Vector3.zero);
+            float xyIntersection;
+            xyPlane.Raycast(ray, out xyIntersection);
+            Vector3 hitPoint = ray.GetPoint(xyIntersection);
+            //_currentRope = Instantiate<Rope>(_ropePrefab, new Vector3(hit.point.x, hit.point.y, 0f), Quaternion.identity);
+            _currentRope = Instantiate<Rope>(_ropePrefab, hitPoint, Quaternion.identity);
             _currentRope.initializeRope(this.transform.position, _rigidbody.velocity);
         }
     }
