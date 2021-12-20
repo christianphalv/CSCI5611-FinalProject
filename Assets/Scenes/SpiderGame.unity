@@ -153,9 +153,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _projectilePrefab: {fileID: 1413334940096971204, guid: 78482c7d5e88d2d4c95e2017bcf4ff1e, type: 3}
-  _fireRate: 2
-  _maxProjectileSpeed: 3
-  _minProjectileSpeed: 8
+  _fireRate: 1.5
+  _maxProjectileSpeed: 10
+  _minProjectileSpeed: 5
 --- !u!4 &67384790
 Transform:
   m_ObjectHideFlags: 0
@@ -2650,7 +2650,7 @@ MonoBehaviour:
   _jumpSpeed: 10
   _maxRopeDistance: 100
   _ropeJumpMin: 0.5
-  _ropeJumpMax: 2
+  _ropeJumpMax: 1.5
 --- !u!54 &1493046372
 Rigidbody:
   m_ObjectHideFlags: 0
