@@ -23,9 +23,9 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if(Input.GetKey(KeyCode.Space)){
-            GameOver();
-        }
+        // if(Input.GetKey(KeyCode.Space)){
+        //     GameOver();
+        // }
         
     }
 
