@@ -26,6 +26,7 @@ public class Player : MonoBehaviour {
     private LayerMask _ropeAttachLayer;
     private Rope _currentRope;
     private Camera _mainCamera;
+    private PlayerController _playerController;
 
     void Start() {
 
@@ -38,6 +39,7 @@ public class Player : MonoBehaviour {
         _ropeAttachLayer = LayerMask.GetMask("RopeAttach");
         _currentRope = null;
         _mainCamera = Camera.main;
+        _playerController = FindObjectOfType<PlayerController>();
     }
 
     void Update() {
@@ -47,6 +49,10 @@ public class Player : MonoBehaviour {
         checkGrounded();
         playerJump();
         playerRope();
+
+        if (this.transform.position.y < 0.5f) {
+            _playerController.GameOver();
+        }
     }
     
     private void playerMove() {

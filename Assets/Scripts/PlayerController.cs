@@ -22,11 +22,6 @@ public class PlayerController : MonoBehaviour
                 gameObject.transform.Translate(Vector3.left * speed * Time.deltaTime);
             }
         }
-
-        // if(Input.GetKey(KeyCode.Space)){
-        //     GameOver();
-        // }
-        
     }
 
     public void StartGame(){
