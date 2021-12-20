@@ -6,41 +6,24 @@ using UnityEngine;
 public class Rope : MonoBehaviour {
 
     [Header("Rope Parameters")]
-    public int _numNodes;
+    public int _numNodes = 8;
 
     [Header("Constants")]
     public float K_gravity = 10f;
-    public float K_restLength = 2f;
+    private float K_restLength;
     public float K_springForce = 50f;
     public float K_dampForce = 20f;
 
     // Rope data
     private Vector3[] _positions;
     private Vector3[] _velocities;
-    private Vector3[] _accelerations;
 
     // Private properties
     private Vector3 _gravity;
     private LineRenderer _lineRenderer;
 
     void Start() {
-
-        // Initialize properties
-        _positions = new Vector3[_numNodes];
-        _velocities = new Vector3[_numNodes];
-        _accelerations = new Vector3[_numNodes];
-        _gravity = new Vector3(0f, -K_gravity, 0f);
-        _lineRenderer = GetComponent<LineRenderer>();
-
-        // Setup rope
-        for (int i = 0; i < _numNodes; i++) {
-            _positions[i] = this.transform.position - new Vector3(0f, i * K_restLength, 0f);
-            _positions[i] = rotatePointAboutPivot(_positions[i], this.transform.position, this.transform.rotation);
-            _velocities[i] = this.transform.position;
-        }
-
-        // Setup line renderer
-        _lineRenderer.positionCount = _numNodes - 1;
+        
     }
 
 
@@ -55,12 +38,48 @@ public class Rope : MonoBehaviour {
 
         // Update rope simulation
         updateRope(Time.deltaTime);
+        //updateEndObject();
     }
 
     private void OnDrawGizmos() {
         for (int i = 0; i < _numNodes; i++) {
             Gizmos.DrawSphere(_positions[i], 0.05f);
         }
+    }
+
+    public void initializeRope(Vector3 playerPosition, Vector3 initialVelocity) {
+
+        // Initialize properties
+        _positions = new Vector3[_numNodes];
+        _velocities = new Vector3[_numNodes];
+        _gravity = new Vector3(0f, -K_gravity, 0f);
+        _lineRenderer = GetComponent<LineRenderer>();
+
+        // Calculate initial rotation quaternion
+        Vector3 toPlayer = playerPosition - this.transform.position;
+        Quaternion initialRotation = Quaternion.FromToRotation(Vector3.down, toPlayer);
+
+        // Calculate rest length
+        K_restLength = toPlayer.magnitude / (_numNodes - 1);
+
+        // Setup rope
+        for (int i = 0; i < _numNodes; i++) {
+            _positions[i] = this.transform.position - new Vector3(0f, i * K_restLength, 0f);
+            _positions[i] = rotatePointAboutPivot(_positions[i], this.transform.position, initialRotation);
+            _velocities[i] = new Vector3(0f, 0f, 0f);
+        }
+
+        _velocities[_numNodes - 1] = initialVelocity;
+
+        // Setup line renderer
+        _lineRenderer.positionCount = _numNodes;
+    }
+
+    public RopeNode getEndNode() {
+        RopeNode node = new RopeNode();
+        node.position = _positions[_numNodes - 1];
+        node.velocity = _velocities[_numNodes - 1];
+        return node;
     }
 
     private void updateRope(float dt) {
@@ -94,20 +113,35 @@ public class Rope : MonoBehaviour {
 
         // Fix top node
         _velocities[0] = new Vector3(0f, 0f, 0f);
+        _positions[0] = this.transform.position;
 
         // Update positions
-        for (int i = 0; i < _numNodes; i++) {
+        for (int i = 1; i < _numNodes; i++) {
             _positions[i] += _velocities[i] * dt;
         }
     }
 
     private void renderRope() {
-
-        // Update positions
         _lineRenderer.SetPositions(_positions);
     }
+
+    /*
+    private void updateEndObject() {
+
+
+        if (_endObject) {
+            _endObject.transform.position = _positions[_numNodes - 1];
+            _endObject.GetComponent<Rigidbody>().velocity = _velocities[_numNodes - 1];
+        }
+    }
+    */
 
     private Vector3 rotatePointAboutPivot(Vector3 point, Vector3 pivot, Quaternion rotation) {
         return rotation * (point - pivot) + pivot;
     }
+}
+
+public struct RopeNode {
+    public Vector3 position;
+    public Vector3 velocity;
 }
