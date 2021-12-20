@@ -1599,11 +1599,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27dc7a1ca0d60c44686fd5a3c71925bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initialMovementSpeed: 5
-  _jumpSpeed: 10
-  _maxRopeDistance: 100
   _groundedPoint: {fileID: 372747908}
   _ropePrefab: {fileID: 7194739293038725208, guid: 708797e62b2d4bd4ea8e70794d967f6a, type: 3}
+  _initialMovementSpeed: 10
+  _jumpSpeed: 10
+  _maxRopeDistance: 100
+  _ropeJumpMin: 0.5
+  _ropeJumpMax: 2
 --- !u!54 &1493046372
 Rigidbody:
   m_ObjectHideFlags: 0
