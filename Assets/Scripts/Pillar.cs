@@ -20,7 +20,7 @@ public class Pillar : MonoBehaviour
 
     void Awake(){
         BoxCollider collider = GetComponent<BoxCollider>();
-        collider.size = new Vector3(collider.size.x, 100, collider.size.z);
+        //collider.size = new Vector3(collider.size.x, 100, collider.size.z);
         canSpawn = true;
         xStart = 5;
     }

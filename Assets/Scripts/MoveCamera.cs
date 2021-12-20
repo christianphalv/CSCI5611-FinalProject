@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class MoveCamera : MonoBehaviour
 {
+    [SerializeField] private GameObject player;
+    void LateUpdate(){
+       if(player.GetComponent<PlayerController>().started){
+         transform.position = new Vector3(player.transform.position.x + 10, 20, transform.position.z);
+       }
+    }
    public void MoveCameraToStart(){
        StartCoroutine(MoveToStart());
    }
