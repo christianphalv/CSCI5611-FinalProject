@@ -68,6 +68,11 @@ public class PillarSpawner : MonoBehaviour
             {
                 Destroy(prefab);
             }
+        prefabs = GameObject.FindGameObjectsWithTag("Rope");
+        foreach  (GameObject prefab in prefabs)
+            {
+                Destroy(prefab);
+            }
     }
 
 

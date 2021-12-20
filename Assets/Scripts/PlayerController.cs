@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private int speed = 10;
+    [SerializeField] private GameObject gameOverItems;
+    [SerializeField] TrailRenderer trail;
 
     public bool started;
 
@@ -20,6 +22,10 @@ public class PlayerController : MonoBehaviour
                 gameObject.transform.Translate(Vector3.left * speed * Time.deltaTime);
             }
         }
+
+        if(Input.GetKey(KeyCode.Space)){
+            GameOver();
+        }
         
     }
 
@@ -29,5 +35,19 @@ public class PlayerController : MonoBehaviour
 
     public void MoveToStart(){
         transform.position = new Vector3(0, 20.5f, 0);
+        trail.enabled = true;
+    }
+
+    public void EndGame(){//called when quit is pressed
+        started = false;
+        trail.enabled = false;
+        MoveToStart();
+    }
+
+    public void GameOver(){//when player gets hit
+        started = false;
+        trail.enabled = false;
+        gameOverItems.SetActive(true);
+
     }
 }

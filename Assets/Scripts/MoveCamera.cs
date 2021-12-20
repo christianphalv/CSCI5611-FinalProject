@@ -16,18 +16,14 @@ public class MoveCamera : MonoBehaviour
    IEnumerator MoveToStart(){
        float time = 0;
        float duration = 1f;
-       Vector3 start = transform.localPosition;
-       Vector3 goal = new Vector3(15, 0, -13);
-       Vector3 startRot = transform.eulerAngles;
-       Vector3 goalRot = new Vector3(8, -1, 0);
+       Vector3 start = transform.position;
+       Vector3 goal = new Vector3(15, 20, -13);
        while(time < duration){
-           transform.localPosition = Vector3.Lerp(start, goal, time / duration);
-           transform.eulerAngles = Vector3.Lerp(startRot, goalRot, time/duration);
+            transform.position = Vector3.Lerp(start, goal, time / duration);
             time += Time.deltaTime;
             yield return null;
        }
-       transform.localPosition = goal;
-       transform.eulerAngles = goalRot;
+       transform.position = goal;
    }
 
    public void MoveCameraToTitle(){
@@ -37,17 +33,13 @@ public class MoveCamera : MonoBehaviour
    IEnumerator MoveToTitle(){
        float time = 0;
        float duration = 1f;
-       Vector3 goal = transform.localPosition;
-       Vector3 start = new Vector3(15, 0, -13);
-       Vector3 goalRot = transform.eulerAngles;
-       Vector3 startRot = new Vector3(8, -1, 0);
+       Vector3 start = transform.position;
+       Vector3 goal = new Vector3(transform.position.x, 90.5f, -13);
        while(time < duration){
-           transform.localPosition = Vector3.Lerp(start, goal, time / duration);
-           transform.eulerAngles = Vector3.Lerp(startRot, goalRot, time/duration);
+           transform.position = Vector3.Lerp(start, goal, time / duration);
             time += Time.deltaTime;
             yield return null;
        }
-       transform.localPosition = goal;
-       transform.eulerAngles = goalRot;
+       transform.position = goal;
    }
 }
