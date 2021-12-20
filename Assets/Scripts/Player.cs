@@ -2,33 +2,47 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 public class Player : MonoBehaviour {
 
     // Public properties
-    public float _movementSpeed;
+    public float _initialMovementSpeed;
     public float _jumpSpeed;
+    public float _maxRopeDistance;
     public Transform _groundedPoint;
+    public Rope _ropePrefab;
 
     // Physics properties
+    private float _movementSpeed;
     private Rigidbody _rigidbody;
     private bool _isGrounded;
     private float _groundedRadius;
     private LayerMask _groundLayer;
+    private LayerMask _ropeAttachLayer;
+    private Rope _currentRope;
+    private Camera _mainCamera;
 
     void Start() {
 
         // Initialize properties
+        _movementSpeed = _initialMovementSpeed;
         _rigidbody = GetComponent<Rigidbody>();
         _isGrounded = true;
         _groundedRadius = 0.01f;
         _groundLayer = LayerMask.GetMask("Ground");
+        _ropeAttachLayer = LayerMask.GetMask("RopeAttach");
+        _currentRope = null;
+        _mainCamera = Camera.main;
     }
 
     void Update() {
+
+
         playerMove();
         checkGrounded();
         playerJump();
+        playerRope();
     }
     
     private void playerMove() {
@@ -45,28 +59,39 @@ public class Player : MonoBehaviour {
         // Set velocity jump
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded) {
             _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, _jumpSpeed, 0f);
+        } else if (Input.GetKeyDown(KeyCode.Space) && _currentRope) {
+            _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, _jumpSpeed, 0f);
+            detachFromRope();
+        }
+    }
+
+    private void playerRope() {
+
+        if (Input.GetMouseButtonDown(0)) {
+            attachToRope();
+
+        } else if (Input.GetMouseButtonUp(0)) {
+            detachFromRope();
         }
 
+        if (_currentRope) {
+            RopeNode endNode = _currentRope.getEndNode();
+            this.transform.position = endNode.position;
+            _rigidbody.velocity = endNode.velocity;
+        }
     }
-    
-    private Quaternion getMouseRotation() {
 
-        // Get the Screen positions of the object
-        Vector2 positionOnScreen = Camera.main.WorldToViewportPoint(transform.position);
+    private void attachToRope() {
+        Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, _maxRopeDistance, _ropeAttachLayer)) {
+            _currentRope = Instantiate<Rope>(_ropePrefab, new Vector3(hit.point.x, hit.point.y, 0f), Quaternion.identity);
+            _currentRope.initializeRope(this.transform.position, _rigidbody.velocity);
+        }
+    }
 
-        // Get the Screen position of the mouse
-        Vector2 mouseOnScreen = (Vector2) Camera.main.ScreenToViewportPoint(Input.mousePosition);
-
-        // Find the direction from the player to the mouse
-        Vector2 dir = mouseOnScreen - positionOnScreen;
-
-        // Find the angle to turn
-        float mouseAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
-
-        // Create quaternion based on mouse angle
-        Quaternion mouseRotation = Quaternion.Euler(new Vector3(0f, 0f, -mouseAngle));
-
-        return mouseRotation;
+    private void detachFromRope() {
+        _currentRope = null;
     }
 
     private void checkGrounded() {

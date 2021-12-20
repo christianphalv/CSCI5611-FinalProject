@@ -44,11 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49b542a1841726343932b53c4b05e71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _numNodes: 20
-  K_gravity: 10
-  K_restLength: 0.1
-  K_springForce: 50
-  K_dampForce: 20
+  _numNodes: 10
+  K_gravity: 20
+  K_springForce: 100
+  K_dampForce: 50
 --- !u!120 &7194739293038725210
 LineRenderer:
   m_ObjectHideFlags: 0
