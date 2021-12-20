@@ -11,12 +11,10 @@ public class PillarSpawner : MonoBehaviour
      private float xMin = 5;
      private float xMax = 10;
      private float yMin = 20;
-     private float yMax = 35;
-     private float zMin = 2.5f;
-     private float zMax = 5;
+     private float yMax = 40;
 
-     private float xPosMin = 7;
-     private float xPosMax = 17;
+     private float xPosMin = 5;
+     private float xPosMax = 20;
 
     void Start()
     {
@@ -45,14 +43,18 @@ public class PillarSpawner : MonoBehaviour
         
         if(screenTopRight.x - lastPos > 15){
             //spawn new pillar
-            GameObject newPillar = Instantiate(pillarPrefab, new Vector3(1, 1, 1), this.transform.rotation);
+            GameObject newPillar = Instantiate(pillarPrefab, new Vector3(1, 1, 3), this.transform.rotation);
             //scale
-            newPillar.transform.localScale = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), Random.Range(zMin, zMax));
+            newPillar.transform.localScale = new Vector3(Random.Range(xMin, xMax), Random.Range(yMin, yMax), 3);
             //adjust pos
             float newX =  lastPos + newPillar.transform.localScale.x + Random.Range(xPosMin, xPosMax) + 10;
-            newPillar.transform.position = new Vector3(newX, newPillar.transform.localScale.y/2, newPillar.transform.localScale.z);
+            newPillar.transform.position = new Vector3(newX, newPillar.transform.localScale.y/2, newPillar.transform.position.z);
             //rename
             newPillar.name = "Pillar";
+            float col = Random.Range(0.1f, 0.9f);
+            Color color = new Color(col, col, col);
+            Renderer pillarRenderer = newPillar.GetComponent<Renderer>();
+            pillarRenderer.material.SetColor("_Color", color);
             lastPos = newPillar.transform.position.x;
         }   
     }
