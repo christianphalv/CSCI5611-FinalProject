@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _numNodes: 10
-  K_gravity: 20
+  K_gravity: 30
   K_springForce: 100
   K_dampForce: 50
 --- !u!120 &7194739293038725210
