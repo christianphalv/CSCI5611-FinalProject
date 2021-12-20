@@ -60,7 +60,7 @@ public class Player : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded) {
             _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, _jumpSpeed, 0f);
         } else if (Input.GetKeyDown(KeyCode.Space) && _currentRope) {
-            _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, _jumpSpeed, 0f);
+            _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, Mathf.Clamp01(_currentRope.getEndNode().velocity.y) * _jumpSpeed, 0f);
             detachFromRope();
         }
     }
